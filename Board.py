@@ -1,14 +1,13 @@
 
 from Tile import Tile
 import copy
-
 class KonaneError(AttributeError):
     """
     This class is used to indicate a problem in the konane game.
     """
 
 class Board():
-    def __init__(self, size, init_board):
+    def __init__(self, size: int, init_board):
         self.size = size
         self.game_board = init_board
 

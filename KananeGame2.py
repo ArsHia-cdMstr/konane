@@ -1,7 +1,8 @@
 from Tile import Tile
+from Board import Board
 
 
-class KonaneGame:
+class KonaneGame2:
     def __init__(self):
         NotImplemented
 
@@ -119,7 +120,24 @@ class KonaneGame:
         """
         return Tile.P_Black if tile == Tile.P_White else Tile.P_White
 
-    def evaluate(self, board, color, terminal_value=0):
+    def check_corners(self, board, player):
+        # this method checks the corner Tiles. if our nuts exist there, it leads to increase value.
+        value = 0
+        if board.game_board[0][0].piece == 2:
+            value += len(self.check(board, 0, 0, -1, +1, 1, self.opponent(player)))
+
+        if board.game_board[0][board.size - 1].piece == 2:
+            value += len(self.check(board, 0, board.size - 1, -1, -1, 1, self.opponent(player)))
+
+        if board.game_board[board.size - 1][board.size - 1].piece == 2:
+            value += len(self.check(board, board.size - 1, board.size - 1, +1, -1, 1, self.opponent(player)))
+
+        if board.game_board[board.size - 1][0].piece == 2:
+            value += len(self.check(board, board.size - 1, 0, 1, 1, 1, self.opponent(player)))
+
+        return value
+
+    def evaluate(self, board: Board, color, terminal_value=0):
 
         value = 0
         valid_moves_color = self.generate_all_possible_moves(board, color)
@@ -127,6 +145,25 @@ class KonaneGame:
 
         value += (10 * len(valid_moves_color))
         value -= (10 * len(valid_moves_opponent))
+
+        # for row in board.game_board:
+        #     for piece in row:
+        #         if piece == color:
+        #             value += 1
+        #         elif piece == self.opponent(color):
+        #             value -= 1
+
+        # center_rows = [board.size // 2 - 1, board.size // 2]
+        # center_cols = [len(board[0]) // 2 - 1, len(board[0]) // 2]
+        # for row in center_rows:
+        #     for col in center_cols:
+        #         if board[row][col] == color:
+        #             value += 1
+        #         elif board[row][col] == opponent(color):
+        #             value -= 1
+
+        value += (20 * self.check_corners(board, color))
+        value -= (20 * self.check_corners(board, self.opponent(color)))
 
         value += terminal_value
 

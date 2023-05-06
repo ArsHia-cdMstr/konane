@@ -29,20 +29,51 @@ class Agent:
         # if we haven't lost we will search more
         all_moves = self.game.generate_all_possible_moves(current_board, current_color)
         best_move = None
+        best_move_value = float('-inf')
 
         for move in all_moves:
             careless_move, move_val = self.min_move_value(current_board.next_board(current_color, move),
-                                                          self.game.opponent
+                                                          self.game.opponent(current_color)
                                                           , depth + 1, Alph, Beta)
-            # tree pruning
-            if move_val >= Beta:
-                return move, move_val
 
-            if Alph < move_val:
+            if best_move_value < move_val:
+                best_move_value = move_val
                 best_move = move
-                Alph = move_val
 
-        return best_move, Alph
+            # tree pruning
+            if best_move_value >= Beta:
+                return best_move, best_move_value
+
+            Alph = max(Alph, best_move_value)
+
+        return best_move, best_move_value
 
     def min_move_value(self, current_board, current_color, depth, Alph, Beta):
-        return None, None
+        # this is our turn and if there is no move for us, we have lost the game
+        if self.game.check_terminal(current_board, current_color):
+            return None, self.game.evaluate(current_board, current_color, 1000)
+
+        # estimate the evaluate func score in maximum depth
+        if depth == self.max_depth:
+            return None, self.game.evaluate(current_board, current_color)
+
+        # if we haven't lost we will search more
+        all_moves = self.game.generate_all_possible_moves(current_board, current_color)
+        best_move = None
+        best_move_value = float('+inf')
+        for move in all_moves:
+            careless_move, move_val = self.min_move_value(current_board.next_board(current_color, move),
+                                                          self.game.opponent(current_color)
+                                                          , depth + 1, Alph, Beta)
+
+            if best_move_value > move_val:
+                best_move_value = move_val
+                best_move = move
+
+            # tree pruning
+            if best_move_value <= Alph:
+                return best_move, best_move_value
+
+            Beta = min(Beta, best_move_value)
+
+        return best_move, best_move_value
