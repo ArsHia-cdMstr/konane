@@ -62,7 +62,7 @@ class Agent:
         best_move = None
         best_move_value = float('+inf')
         for move in all_moves:
-            careless_move, move_val = self.min_move_value(current_board.next_board(current_color, move),
+            careless_move, move_val = self.max_move_value(current_board.next_board(current_color, move),
                                                           self.game.opponent(current_color)
                                                           , depth + 1, Alph, Beta)
 
